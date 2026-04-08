@@ -5,6 +5,7 @@ from graph import (find_safest_path, get_all_statuses,
                    update_zone, clear_zone)
 from simulator import start_simulation, get_zone_data, trigger_fire, clear_fire
 from mqtt_client import start_mqtt
+from thingspeak import start_thingspeak
 
 app = Flask(__name__)
 CORS(app)
@@ -83,4 +84,5 @@ if __name__ == "__main__":
     print("Server running at http://localhost:5000")
     start_simulation(socketio)
     start_mqtt(socketio)
+    start_thingspeak(get_zone_data)
     socketio.run(app, port=5000, debug=False)
