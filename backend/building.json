@@ -1,0 +1,24 @@
+{
+    "building": "Smart Fire Evacuation System",
+    "floors": 3,
+    "zones": {
+      "Z1":  { "name": "Main Lobby",       "floor": 1, "neighbors": ["Z2", "Z3"] },
+      "Z2":  { "name": "Cafeteria",         "floor": 1, "neighbors": ["Z1", "Z4"] },
+      "Z3":  { "name": "Admin Block",       "floor": 1, "neighbors": ["Z1", "Z4"] },
+      "Z4":  { "name": "Utility Room",      "floor": 1, "neighbors": ["Z2", "Z3", "Z5"] },
+      "Z5":  { "name": "Lab A",             "floor": 2, "neighbors": ["Z4", "Z6", "Z7"] },
+      "Z6":  { "name": "Lab B",             "floor": 2, "neighbors": ["Z5", "Z8"] },
+      "Z7":  { "name": "Staff Lounge",      "floor": 2, "neighbors": ["Z5", "Z8"] },
+      "Z8":  { "name": "HOD Office",        "floor": 2, "neighbors": ["Z6", "Z7", "Z9"] },
+      "Z9":  { "name": "Server Room",       "floor": 3, "neighbors": ["Z8", "Z10"] },
+      "Z10": { "name": "Conference Hall",   "floor": 3, "neighbors": ["Z9", "Z11"] },
+      "Z11": { "name": "Director Office",   "floor": 3, "neighbors": ["Z10", "Z12"] },
+      "Z12": { "name": "Records Room",      "floor": 3, "neighbors": ["Z11"] }
+    },
+    "exits": {
+      "EXIT1": { "name": "Exit 1", "floor": 1, "neighbors": ["Z1"] },
+      "EXIT2": { "name": "Exit 2", "floor": 1, "neighbors": ["Z2"] },
+      "EXIT3": { "name": "Exit 3", "floor": 1, "neighbors": ["Z3"] },
+      "EXIT4": { "name": "Exit 4", "floor": 1, "neighbors": ["Z4"] }
+    }
+  }
