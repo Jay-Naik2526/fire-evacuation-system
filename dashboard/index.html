@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire Evacuation System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e94560">
+</head>
+<body>
+
+  <header>
+    <h1>🔥 Smart Fire Evacuation System</h1>
+    <div class="conn-status">
+      <div class="conn-dot" id="connDot"></div>
+      <span id="connText">Connecting...</span>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- LEFT: Floor Map -->
+    <div class="map-section">
+      <h2>Live Building Map</h2>
+
+      <!-- Floor 3 -->
+      <div class="floor">
+        <div class="floor-label">Floor 3</div>
+        <div class="zones-row">
+          <div class="zone SAFE" id="Z9"  onclick="selectZone('Z9')">
+            <div class="zone-id">Z9</div>
+            <div class="zone-name">Server Room</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z10" onclick="selectZone('Z10')">
+            <div class="zone-id">Z10</div>
+            <div class="zone-name">Conference Hall</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z11" onclick="selectZone('Z11')">
+            <div class="zone-id">Z11</div>
+            <div class="zone-name">Director Office</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z12" onclick="selectZone('Z12')">
+            <div class="zone-id">Z12</div>
+            <div class="zone-name">Records Room</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floor 2 -->
+      <div class="floor">
+        <div class="floor-label">Floor 2</div>
+        <div class="zones-row">
+          <div class="zone SAFE" id="Z5" onclick="selectZone('Z5')">
+            <div class="zone-id">Z5</div>
+            <div class="zone-name">Lab A</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z6" onclick="selectZone('Z6')">
+            <div class="zone-id">Z6</div>
+            <div class="zone-name">Lab B</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z7" onclick="selectZone('Z7')">
+            <div class="zone-id">Z7</div>
+            <div class="zone-name">Staff Lounge</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z8" onclick="selectZone('Z8')">
+            <div class="zone-id">Z8</div>
+            <div class="zone-name">HOD Office</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floor 1 -->
+      <div class="floor">
+        <div class="floor-label">Floor 1 — Ground</div>
+        <div class="zones-row">
+          <div class="zone SAFE" id="Z1" onclick="selectZone('Z1')">
+            <div class="zone-id">Z1</div>
+            <div class="zone-name">Main Lobby</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z2" onclick="selectZone('Z2')">
+            <div class="zone-id">Z2</div>
+            <div class="zone-name">Cafeteria</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z3" onclick="selectZone('Z3')">
+            <div class="zone-id">Z3</div>
+            <div class="zone-name">Admin Block</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+          <div class="zone SAFE" id="Z4" onclick="selectZone('Z4')">
+            <div class="zone-id">Z4</div>
+            <div class="zone-name">Utility Room</div>
+            <div class="zone-status">SAFE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exits -->
+      <div class="exits-row">
+        <div class="exit-box">🚪 EXIT 1</div>
+        <div class="exit-box">🚪 EXIT 2</div>
+        <div class="exit-box">🚪 EXIT 3</div>
+        <div class="exit-box">🚪 EXIT 4</div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Sidebar -->
+    <div class="sidebar">
+
+      <!-- Stats -->
+      <div class="panel">
+        <h3>Zone Summary</h3>
+        <div class="stats-grid">
+          <div class="stat-box fire-stat">
+            <div class="stat-number" id="fireCount">0</div>
+            <div class="stat-label">Fire</div>
+          </div>
+          <div class="stat-box smoke-stat">
+            <div class="stat-number" id="smokeCount">0</div>
+            <div class="stat-label">Smoke</div>
+          </div>
+          <div class="stat-box safe-stat">
+            <div class="stat-number" id="safeCount">12</div>
+            <div class="stat-label">Safe</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evacuation Path -->
+      <div class="panel">
+        <h3>Evacuation Path</h3>
+        <div class="path-display" id="pathDisplay">
+          <span style="color:#666;font-size:13px">Click a zone to see safest path</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="panel">
+        <h3>Controls</h3>
+        <div class="controls">
+          <div>
+            <label>Select Zone</label>
+            <select id="zoneSelect">
+              <option value="">-- Select Zone --</option>
+              <option value="Z1">Z1 - Main Lobby</option>
+              <option value="Z2">Z2 - Cafeteria</option>
+              <option value="Z3">Z3 - Admin Block</option>
+              <option value="Z4">Z4 - Utility Room</option>
+              <option value="Z5">Z5 - Lab A</option>
+              <option value="Z6">Z6 - Lab B</option>
+              <option value="Z7">Z7 - Staff Lounge</option>
+              <option value="Z8">Z8 - HOD Office</option>
+              <option value="Z9">Z9 - Server Room</option>
+              <option value="Z10">Z10 - Conference Hall</option>
+              <option value="Z11">Z11 - Director Office</option>
+              <option value="Z12">Z12 - Records Room</option>
+            </select>
+          </div>
+          <button class="btn btn-fire"  onclick="triggerFire()">🔥 Trigger Fire</button>
+          <button class="btn btn-clear" onclick="clearFire()">✅ Clear Zone</button>
+          <button class="btn btn-path"  onclick="getPath()">🗺 Get Safe Path</button>
+        </div>
+      </div>
+
+      <!-- Event Log -->
+      <div class="panel">
+        <h3>Event Log</h3>
+        <div class="log-list" id="logList">
+          <div class="log-item SAFE">
+            <div class="log-time">Now</div>
+            System started — all zones safe
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

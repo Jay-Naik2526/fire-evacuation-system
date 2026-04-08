@@ -1,0 +1,16 @@
+{
+    "name": "Fire Evacuation System",
+    "short_name": "FireEvac",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a1a",
+    "theme_color": "#e94560",
+    "description": "Smart Fire Evacuation Guidance System",
+    "icons": [
+      {
+        "src": "https://via.placeholder.com/192x192/e94560/ffffff?text=FE",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  }

@@ -1,51 +1,33 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from graph import find_safest_path, get_all_statuses, update_zone
+from graph import (find_safest_path, get_all_statuses,
+                   update_zone, clear_zone)
 from simulator import start_simulation, get_zone_data, trigger_fire, clear_fire
+from mqtt_client import start_mqtt
 
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# ─── Routes ───────────────────────────────────────────
-
 @app.route("/")
 def home():
-    return jsonify({"message": "Fire Evacuation System Backend Running!"})
+    return jsonify({"message": "Fire Evacuation Backend Running!"})
 
 @app.route("/zones")
-def get_zones():
+def zones():
     return jsonify(get_zone_data())
 
 @app.route("/path/<zone_id>")
-def get_path(zone_id):
-    path, cost = find_safest_path(zone_id)
-    return jsonify({
-        "from": zone_id,
-        "path": path,
-        "cost": cost
-    })
-
-@app.route("/trigger/fire/<zone_id>", methods=["POST"])
-def trigger_fire_route(zone_id):
-    trigger_fire(zone_id)
-    update_zone(zone_id, "FIRE")
-    socketio.emit("zone_update", get_zone_data())
-    return jsonify({"message": f"Fire triggered in {zone_id}"})
-
-@app.route("/trigger/clear/<zone_id>", methods=["POST"])
-def clear_fire_route(zone_id):
-    clear_fire(zone_id)
-    update_zone(zone_id, "SAFE")
-    socketio.emit("zone_update", get_zone_data())
-    return jsonify({"message": f"{zone_id} cleared"})
+def path(zone_id):
+    p, cost = find_safest_path(zone_id)
+    return jsonify({"from": zone_id, "path": p, "cost": cost})
 
 @app.route("/status")
-def get_status():
+def status():
     return jsonify(get_all_statuses())
 
-# ─── Socket Events ────────────────────────────────────
+# ─── Socket Events ─────────────────────────────────────
 
 @socketio.on("connect")
 def on_connect():
@@ -55,6 +37,24 @@ def on_connect():
 @socketio.on("request_path")
 def on_request_path(data):
     zone_id = data.get("zone")
+    if not zone_id:
+        return
+    path, cost = find_safest_path(zone_id)
+    socketio.emit("path_update", {
+        "from":  zone_id,
+        "path":  path,
+        "cost":  cost
+    })
+
+@socketio.on("trigger_fire")
+def on_trigger_fire(data):
+    zone_id = data.get("zone")
+    if not zone_id:
+        return
+    trigger_fire(zone_id)
+    update_zone(zone_id, "FIRE")
+    socketio.emit("zone_update", get_zone_data())
+    # Recalculate paths for all zones
     path, cost = find_safest_path(zone_id)
     socketio.emit("path_update", {
         "from": zone_id,
@@ -62,24 +62,25 @@ def on_request_path(data):
         "cost": cost
     })
 
-@socketio.on("trigger_fire")
-def on_trigger_fire(data):
-    zone_id = data.get("zone")
-    trigger_fire(zone_id)
-    update_zone(zone_id, "FIRE")
-    socketio.emit("zone_update", get_zone_data())
-
 @socketio.on("clear_fire")
 def on_clear_fire(data):
     zone_id = data.get("zone")
+    if not zone_id:
+        return
+    # Clear from simulator and graph both
     clear_fire(zone_id)
-    update_zone(zone_id, "SAFE")
+    clear_zone(zone_id)
+    # Force update to dashboard immediately
     socketio.emit("zone_update", get_zone_data())
-
-# ─── Start ────────────────────────────────────────────
+    socketio.emit("path_update", {
+        "from": zone_id,
+        "path": [zone_id, "cleared"],
+        "cost": 0
+    })
 
 if __name__ == "__main__":
     print("Starting Fire Evacuation Backend...")
     print("Server running at http://localhost:5000")
     start_simulation(socketio)
+    start_mqtt(socketio)
     socketio.run(app, port=5000, debug=False)
