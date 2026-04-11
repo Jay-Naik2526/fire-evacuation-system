@@ -6,6 +6,7 @@ from graph import (find_safest_path, get_all_statuses,
 from simulator import start_simulation, get_zone_data, trigger_fire, clear_fire
 from mqtt_client import start_mqtt
 from thingspeak import start_thingspeak
+from blynk_client import start_blynk
 
 app = Flask(__name__)
 CORS(app)
@@ -41,11 +42,17 @@ def on_request_path(data):
     if not zone_id:
         return
     path, cost = find_safest_path(zone_id)
+
+    # Send to web dashboard
     socketio.emit("path_update", {
         "from":  zone_id,
         "path":  path,
         "cost":  cost
     })
+
+    # Send to Blynk — whichever zone user selected
+    from blynk_client import send_evacuation_path
+    send_evacuation_path(path)
 
 @socketio.on("trigger_fire")
 def on_trigger_fire(data):
@@ -55,13 +62,16 @@ def on_trigger_fire(data):
     trigger_fire(zone_id)
     update_zone(zone_id, "FIRE")
     socketio.emit("zone_update", get_zone_data())
-    # Recalculate paths for all zones
+
+    # Path update — reuse request_path logic
     path, cost = find_safest_path(zone_id)
     socketio.emit("path_update", {
         "from": zone_id,
         "path": path,
         "cost": cost
     })
+    from blynk_client import send_evacuation_path
+    send_evacuation_path(path)
 
 @socketio.on("clear_fire")
 def on_clear_fire(data):
@@ -85,4 +95,5 @@ if __name__ == "__main__":
     start_simulation(socketio)
     start_mqtt(socketio)
     start_thingspeak(get_zone_data)
+    start_blynk(get_zone_data)
     socketio.run(app, port=5000, debug=False)

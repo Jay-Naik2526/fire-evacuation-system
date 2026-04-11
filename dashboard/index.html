@@ -2,192 +2,416 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fire Evacuation System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>FireGuard — Smart Evacuation System</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#e94560">
+  <meta name="theme-color" content="#ff3b3b">
+  
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <h1>🔥 Smart Fire Evacuation System</h1>
-    <div class="conn-status">
-      <div class="conn-dot" id="connDot"></div>
-      <span id="connText">Connecting...</span>
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2C14 2 6 10 6 16a8 8 0 0016 0C22 10 14 2 14 2z" fill="#ff3b3b" opacity="0.9"/>
+          <path d="M14 8C14 8 10 13 10 17a4 4 0 008 0C18 13 14 8 14 8z" fill="#ff8c00" opacity="0.8"/>
+          <circle cx="14" cy="18" r="2" fill="#fff" opacity="0.9"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">FireGuard</div>
+        <div class="logo-sub">Smart Evacuation System</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="conn-pill" id="connPill">
+        <span class="conn-dot" id="connDot"></span>
+        <span id="connText">Connecting</span>
+      </div>
+      <div class="time-display" id="timeDisplay"></div>
     </div>
   </header>
 
-  <div class="container">
+  <!-- Alert Banner -->
+  <div class="alert-banner" id="alertBanner" style="display:none">
+    <span class="alert-icon">!</span>
+    <span id="alertText">Fire detected in Zone Z9 — evacuate immediately</span>
+    <button onclick="dismissAlert()">Dismiss</button>
+  </div>
 
-    <!-- LEFT: Floor Map -->
-    <div class="map-section">
-      <h2>Live Building Map</h2>
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-pill fire-pill">
+      <span class="stat-num" id="fireCount">0</span>
+      <span class="stat-lbl">On Fire</span>
+    </div>
+    <div class="stat-pill smoke-pill">
+      <span class="stat-num" id="smokeCount">0</span>
+      <span class="stat-lbl">Smoke</span>
+    </div>
+    <div class="stat-pill safe-pill">
+      <span class="stat-num" id="safeCount">12</span>
+      <span class="stat-lbl">Safe</span>
+    </div>
+    <div class="stat-pill total-pill">
+      <span class="stat-num">12</span>
+      <span class="stat-lbl">Total Zones</span>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <main class="main">
+
+    <!-- LEFT: Building Map -->
+    <section class="map-section">
+      <div class="section-header">
+        <h2>Live Building Map</h2>
+        <span class="live-badge">LIVE</span>
+      </div>
 
       <!-- Floor 3 -->
-      <div class="floor">
-        <div class="floor-label">Floor 3</div>
-        <div class="zones-row">
-          <div class="zone SAFE" id="Z9"  onclick="selectZone('Z9')">
-            <div class="zone-id">Z9</div>
+      <div class="floor-block">
+        <div class="floor-tag">
+          <span class="floor-num">3</span>
+          <span class="floor-name">Floor 3</span>
+        </div>
+        <div class="zones-grid">
+          <div class="zone SAFE" id="Z9" onclick="selectZone('Z9')">
+            <div class="zone-header">
+              <span class="zone-id">Z9</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Server Room</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z9-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z9-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z10" onclick="selectZone('Z10')">
-            <div class="zone-id">Z10</div>
+            <div class="zone-header">
+              <span class="zone-id">Z10</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Conference Hall</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z10-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z10-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z11" onclick="selectZone('Z11')">
-            <div class="zone-id">Z11</div>
+            <div class="zone-header">
+              <span class="zone-id">Z11</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Director Office</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z11-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z11-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z12" onclick="selectZone('Z12')">
-            <div class="zone-id">Z12</div>
+            <div class="zone-header">
+              <span class="zone-id">Z12</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Records Room</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z12-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z12-crowd">--</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Floor 2 -->
-      <div class="floor">
-        <div class="floor-label">Floor 2</div>
-        <div class="zones-row">
+      <div class="floor-block">
+        <div class="floor-tag">
+          <span class="floor-num">2</span>
+          <span class="floor-name">Floor 2</span>
+        </div>
+        <div class="zones-grid">
           <div class="zone SAFE" id="Z5" onclick="selectZone('Z5')">
-            <div class="zone-id">Z5</div>
+            <div class="zone-header">
+              <span class="zone-id">Z5</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Lab A</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z5-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z5-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z6" onclick="selectZone('Z6')">
-            <div class="zone-id">Z6</div>
+            <div class="zone-header">
+              <span class="zone-id">Z6</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Lab B</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z6-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z6-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z7" onclick="selectZone('Z7')">
-            <div class="zone-id">Z7</div>
+            <div class="zone-header">
+              <span class="zone-id">Z7</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Staff Lounge</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z7-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z7-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z8" onclick="selectZone('Z8')">
-            <div class="zone-id">Z8</div>
+            <div class="zone-header">
+              <span class="zone-id">Z8</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">HOD Office</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z8-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z8-crowd">--</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Floor 1 -->
-      <div class="floor">
-        <div class="floor-label">Floor 1 — Ground</div>
-        <div class="zones-row">
+      <div class="floor-block">
+        <div class="floor-tag ground">
+          <span class="floor-num">G</span>
+          <span class="floor-name">Ground</span>
+        </div>
+        <div class="zones-grid">
           <div class="zone SAFE" id="Z1" onclick="selectZone('Z1')">
-            <div class="zone-id">Z1</div>
+            <div class="zone-header">
+              <span class="zone-id">Z1</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Main Lobby</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z1-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z1-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z2" onclick="selectZone('Z2')">
-            <div class="zone-id">Z2</div>
+            <div class="zone-header">
+              <span class="zone-id">Z2</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Cafeteria</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z2-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z2-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z3" onclick="selectZone('Z3')">
-            <div class="zone-id">Z3</div>
+            <div class="zone-header">
+              <span class="zone-id">Z3</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Admin Block</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z3-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z3-crowd">--</span>
+            </div>
           </div>
           <div class="zone SAFE" id="Z4" onclick="selectZone('Z4')">
-            <div class="zone-id">Z4</div>
+            <div class="zone-header">
+              <span class="zone-id">Z4</span>
+              <span class="zone-badge">SAFE</span>
+            </div>
             <div class="zone-name">Utility Room</div>
-            <div class="zone-status">SAFE</div>
+            <div class="zone-sensors">
+              <span class="sensor-val" id="Z4-smoke">--</span>
+              <span class="sensor-sep">|</span>
+              <span class="sensor-val" id="Z4-crowd">--</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Exits -->
       <div class="exits-row">
-        <div class="exit-box">🚪 EXIT 1</div>
-        <div class="exit-box">🚪 EXIT 2</div>
-        <div class="exit-box">🚪 EXIT 3</div>
-        <div class="exit-box">🚪 EXIT 4</div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT: Sidebar -->
-    <div class="sidebar">
-
-      <!-- Stats -->
-      <div class="panel">
-        <h3>Zone Summary</h3>
-        <div class="stats-grid">
-          <div class="stat-box fire-stat">
-            <div class="stat-number" id="fireCount">0</div>
-            <div class="stat-label">Fire</div>
-          </div>
-          <div class="stat-box smoke-stat">
-            <div class="stat-number" id="smokeCount">0</div>
-            <div class="stat-label">Smoke</div>
-          </div>
-          <div class="stat-box safe-stat">
-            <div class="stat-number" id="safeCount">12</div>
-            <div class="stat-label">Safe</div>
-          </div>
+        <div class="exit-box" id="exit1">
+          <div class="exit-arrow">↓</div>
+          <div class="exit-label">EXIT 1</div>
+        </div>
+        <div class="exit-box" id="exit2">
+          <div class="exit-arrow">↓</div>
+          <div class="exit-label">EXIT 2</div>
+        </div>
+        <div class="exit-box" id="exit3">
+          <div class="exit-arrow">↓</div>
+          <div class="exit-label">EXIT 3</div>
+        </div>
+        <div class="exit-box" id="exit4">
+          <div class="exit-arrow">↓</div>
+          <div class="exit-label">EXIT 4</div>
         </div>
       </div>
 
+      <div class="map-legend">
+        <span class="legend-item"><span class="legend-dot safe-dot"></span>Safe</span>
+        <span class="legend-item"><span class="legend-dot smoke-dot"></span>Smoke</span>
+        <span class="legend-item"><span class="legend-dot fire-dot"></span>Fire</span>
+        <span class="legend-item legend-sensor">Smoke ppm | People</span>
+      </div>
+    </section>
+
+    <!-- RIGHT: Sidebar -->
+    <aside class="sidebar">
+
       <!-- Evacuation Path -->
-      <div class="panel">
-        <h3>Evacuation Path</h3>
+      <div class="panel path-panel">
+        <div class="panel-header">
+          <h3>Evacuation Path</h3>
+          <span class="panel-hint" id="pathHint">select a zone</span>
+        </div>
         <div class="path-display" id="pathDisplay">
-          <span style="color:#666;font-size:13px">Click a zone to see safest path</span>
+          <div class="path-empty">
+            <div class="path-empty-icon">?</div>
+            <p>Click any zone on the map to calculate the safest evacuation route</p>
+          </div>
         </div>
       </div>
 
       <!-- Controls -->
-      <div class="panel">
-        <h3>Controls</h3>
+      <div class="panel controls-panel">
+        <div class="panel-header">
+          <h3>Zone Controls</h3>
+        </div>
         <div class="controls">
-          <div>
-            <label>Select Zone</label>
-            <select id="zoneSelect">
-              <option value="">-- Select Zone --</option>
-              <option value="Z1">Z1 - Main Lobby</option>
-              <option value="Z2">Z2 - Cafeteria</option>
-              <option value="Z3">Z3 - Admin Block</option>
-              <option value="Z4">Z4 - Utility Room</option>
-              <option value="Z5">Z5 - Lab A</option>
-              <option value="Z6">Z6 - Lab B</option>
-              <option value="Z7">Z7 - Staff Lounge</option>
-              <option value="Z8">Z8 - HOD Office</option>
-              <option value="Z9">Z9 - Server Room</option>
-              <option value="Z10">Z10 - Conference Hall</option>
-              <option value="Z11">Z11 - Director Office</option>
-              <option value="Z12">Z12 - Records Room</option>
-            </select>
+          <select id="zoneSelect" class="zone-select">
+            <option value="">Select a zone...</option>
+            <option value="Z1">Z1 — Main Lobby</option>
+            <option value="Z2">Z2 — Cafeteria</option>
+            <option value="Z3">Z3 — Admin Block</option>
+            <option value="Z4">Z4 — Utility Room</option>
+            <option value="Z5">Z5 — Lab A</option>
+            <option value="Z6">Z6 — Lab B</option>
+            <option value="Z7">Z7 — Staff Lounge</option>
+            <option value="Z8">Z8 — HOD Office</option>
+            <option value="Z9">Z9 — Server Room</option>
+            <option value="Z10">Z10 — Conference Hall</option>
+            <option value="Z11">Z11 — Director Office</option>
+            <option value="Z12">Z12 — Records Room</option>
+          </select>
+          <div class="btn-group">
+            <button class="btn btn-fire" onclick="triggerFire()">
+              <span class="btn-icon">!</span> Trigger Fire
+            </button>
+            <button class="btn btn-clear" onclick="clearFire()">
+              <span class="btn-icon">✓</span> Clear Zone
+            </button>
           </div>
-          <button class="btn btn-fire"  onclick="triggerFire()">🔥 Trigger Fire</button>
-          <button class="btn btn-clear" onclick="clearFire()">✅ Clear Zone</button>
-          <button class="btn btn-path"  onclick="getPath()">🗺 Get Safe Path</button>
+          <button class="btn btn-path" onclick="getPath()">
+            Get Safest Path
+          </button>
         </div>
       </div>
 
       <!-- Event Log -->
-      <div class="panel">
-        <h3>Event Log</h3>
+      <div class="panel log-panel">
+        <div class="panel-header">
+          <h3>Event Log</h3>
+          <button class="clear-log-btn" onclick="clearLog()">Clear</button>
+        </div>
         <div class="log-list" id="logList">
           <div class="log-item SAFE">
-            <div class="log-time">Now</div>
-            System started — all zones safe
+            <span class="log-dot"></span>
+            <div class="log-body">
+              <div class="log-time">Now</div>
+              <div class="log-msg">System started — all zones safe</div>
+            </div>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
+    </aside>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <button class="mob-btn active" onclick="showTab('map')" id="tab-map">
+      <span class="mob-icon">&#9776;</span>
+      <span>Map</span>
+    </button>
+    <button class="mob-btn" onclick="showTab('path')" id="tab-path">
+      <span class="mob-icon">&#8594;</span>
+      <span>Path</span>
+    </button>
+    <button class="mob-btn" onclick="showTab('controls')" id="tab-controls">
+      <span class="mob-icon">&#9881;</span>
+      <span>Controls</span>
+    </button>
+    <button class="mob-btn" onclick="showTab('log')" id="tab-log">
+      <span class="mob-icon">&#9776;</span>
+      <span>Log</span>
+    </button>
+  </nav>
 
   <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Clock
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('timeDisplay').textContent =
+        now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Alert banner
+    function showAlert(msg) {
+      document.getElementById('alertText').textContent = msg;
+      document.getElementById('alertBanner').style.display = 'flex';
+    }
+    function dismissAlert() {
+      document.getElementById('alertBanner').style.display = 'none';
+    }
+
+    // Clear log
+    function clearLog() {
+      document.getElementById('logList').innerHTML = '';
+    }
+
+    // Mobile tabs
+    function showTab(tab) {
+      document.querySelectorAll('.mob-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      const map = document.querySelector('.map-section');
+      const sidebar = document.querySelector('.sidebar');
+      if (tab === 'map') {
+        map.style.display = 'block';
+        sidebar.style.display = 'none';
+      } else {
+        map.style.display = 'none';
+        sidebar.style.display = 'flex';
+        // scroll to correct panel
+        const panels = { path: 0, controls: 1, log: 2 };
+        const allPanels = document.querySelectorAll('.panel');
+        if (panels[tab] !== undefined) {
+          allPanels[panels[tab]].scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  </script>
 </body>
 </html>
